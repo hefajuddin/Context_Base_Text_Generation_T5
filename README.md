@@ -11,4 +11,4 @@ python app.py
 
 5. Go to browser, hit http://127.0.0.1:5001/ now UI is displaying
 
-6. Input any question on your given context into input box and hit ente,r now you will get an answer
+6. Input any question on your given context into input box and hit enter now you will get an answer

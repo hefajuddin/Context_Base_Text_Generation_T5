@@ -3,45 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-A</title>
+    <title>Text Generation</title>
+    <h3 style="text-align: center;">Contextual Chat GPT</h3>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .chatbox { width: 500px; margin: 50px auto; }
-        .messages { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
-        .message { margin: 10px 0; width: 500px; }
-        .bot { color: blue; }
-        .user { text-align: right; color: green; }
-        .input-box { margin-top: 10px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .chatbox {
+            width: 500px;
+            margin: 50px auto;
+        }
+        .messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .message {
+            margin: 10px 0;
+            width: 100%;
+        }
+        .bot {
+            color: blue;
+        }
+        .user {
+            text-align: right;
+            color: green;
+        }
+        .input-box {
+            margin-top: 10px;
+            display: flex; /* Ensures alignment of input and button */
+        }
+        .input-box input {
+            flex: 1; /* Takes up the full available width */
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-right: none; /* Removes right border to match button */
+            border-radius: 4px 0 0 4px; /* Rounded corners on the left side */
+        }
+        .input-box button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+            border-radius: 0 4px 4px 0; /* Rounded corners on the right side */
+            cursor: pointer;
+        }
+        .input-box button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="chatbox">
         <div class="messages" id="messages"></div>
         <div class="input-box">
-            <input width="500px" type="text" id="userInput" placeholder="Ask me on given context..." />
-            <button onclick="sendMessage()">Send</button>
+            <input type="text" id="userInput" placeholder="Ask me on given context..." />
+            <button onclick="sendMessage()">Get Answer</button>
         </div>
     </div>
 
     <script>
+        // Call sendMessage on Enter key press
+        document.getElementById("userInput").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
         async function sendMessage() {
-            const userInput = document.getElementById("userInput").value;
+            const userInput = document.getElementById("userInput").value.trim();
             const messages = document.getElementById("messages");
-            
+
+            if (!userInput) return; // Prevent sending empty messages
+
             // Display user message
             messages.innerHTML += `<div class="message user">${userInput}</div>`;
             document.getElementById("userInput").value = "";
 
-            // Send message to server
-            const response = await fetch("/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: userInput })
-            });
-            const data = await response.json();
+            // Ensure scroll remains at the bottom
+            messages.scrollTop = messages.scrollHeight;
 
-            // Display bot response
-            messages.innerHTML += `<div class="message bot">${data.response}</div>`;
+            // Send message to server
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: userInput })
+                });
+                const data = await response.json();
+
+                // Display bot response
+                messages.innerHTML += `<div class="message bot">${data.response}</div>`;
+                messages.scrollTop = messages.scrollHeight; // Adjust scroll again
+            } catch (error) {
+                console.error("Error sending message:", error);
+                messages.innerHTML += `<div class="message bot">Error: Unable to fetch response.</div>`;
+            }
         }
     </script>
 </body>

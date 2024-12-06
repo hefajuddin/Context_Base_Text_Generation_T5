@@ -23,9 +23,19 @@ def chat():
     context = load_dynamic_context()
     prompt = f"question: {user_input}  context: {context}"
     inputs = tokenizer.encode(prompt, return_tensors="pt")
-    outputs = model.generate(inputs, max_length=50, num_beams=4, early_stopping=True)
+    # outputs = model.generate(inputs, max_length=50, num_beams=4, early_stopping=True)
+    outputs = model.generate(
+        inputs, 
+        max_length=50, 
+        num_return_sequences=1, 
+        pad_token_id=tokenizer.eos_token_id, 
+        temperature=0.7, 
+        top_k=50, 
+        top_p=0.9,
+        repetition_penalty=1.2  # Penalizes repeating tokens
+    )
     answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return jsonify({"response": answer})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

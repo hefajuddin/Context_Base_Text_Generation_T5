@@ -1,5 +1,4 @@
 # Context_Base_Text_Generation_T5
-# Contex_Based_QA
 1. Install requirment using following command-
 pip install -r requirements.txt
 

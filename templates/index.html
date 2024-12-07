@@ -56,6 +56,10 @@
         .input-box button:hover {
             background-color: #0056b3;
         }
+        .loading {
+            color: gray;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +89,10 @@
             messages.innerHTML += `<div class="message user">${userInput}</div>`;
             document.getElementById("userInput").value = "";
 
+            // Display loading message
+            const loadingMessage = `<div class="message bot loading" id="loading">Waiting for response...</div>`;
+            messages.innerHTML += loadingMessage;
+
             // Ensure scroll remains at the bottom
             messages.scrollTop = messages.scrollHeight;
 
@@ -97,11 +105,21 @@
                 });
                 const data = await response.json();
 
+                // Remove loading message
+                const loadingElement = document.getElementById("loading");
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+
                 // Display bot response
                 messages.innerHTML += `<div class="message bot">${data.response}</div>`;
                 messages.scrollTop = messages.scrollHeight; // Adjust scroll again
             } catch (error) {
                 console.error("Error sending message:", error);
+                const loadingElement = document.getElementById("loading");
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
                 messages.innerHTML += `<div class="message bot">Error: Unable to fetch response.</div>`;
             }
         }
